@@ -5,6 +5,7 @@ from scipy import stats
 from scipy.stats import multivariate_normal
 import matplotlib.pyplot as plt
 import numpy as np
+import os
 
 def visualize_contour(mean, cov,  alpha=1):
 	delta = 1.0
@@ -147,28 +148,35 @@ def main():
 	print_mean_cov("red", correct_red_mean, correct_red_cov)
 	print_mean_cov("blue", correct_blue_mean, correct_blue_cov)
 
+	# for saving the figures
+	output_dir = "figures"
+	if not os.path.exists(output_dir):
+		os.makedirs(output_dir)
+
 	# visualize known colors
+	plt.clf()
 	plt.plot(red_x, red_y, 'ro', color='r', ms=1)
 	plt.plot(blue_x, blue_y, 'ro', color='b', ms=1)
 	plt.axis('equal')
 	plt.title(r'Distribution of Red and Blue Data (Known Colors)', fontsize=15);
-	# plt.show()
+	plt.savefig(os.path.join(output_dir, "00_distribution-known"))
 
 	# visualize unknown colors
 	plt.clf()
 	plt.plot(both_x, both_y, 'ro', color='purple', ms=1)
 	plt.axis('equal')
 	plt.title(r'Distribution of Red and Blue Data (Unknown Colors)', fontsize=15);
-	# plt.show()
+	plt.savefig(os.path.join(output_dir, "01_distribution-unknown"))
 
 	# visualize correct estimation
+	plt.clf()
 	plt.plot(red_x, red_y, 'ro', color='r', ms=1)
 	plt.plot(blue_x, blue_y, 'ro', color='b', ms=1)
 	plt.axis('equal')
 	plt.title(r'Correct Estimation', fontsize=15);
 	visualize_contour(correct_red_mean, correct_red_cov)
 	visualize_contour(correct_blue_mean, correct_blue_cov)
-	# plt.show()
+	plt.savefig(os.path.join(output_dir, "02_correct-estimation"))
 
 	# estimates for the mean
 	red_mean_guess = [1.0, 1.0]
@@ -179,13 +187,14 @@ def main():
 	blue_cov_guess = [[4.3, 0], [0, 7]]
 
 	# visualize first guess
+	plt.clf()
 	plt.plot(red_x, red_y, 'ro', color='r', ms=1)
 	plt.plot(blue_x, blue_y, 'ro', color='b', ms=1)
 	plt.axis('equal')
 	plt.title(r'First Guess', fontsize=15);
 	visualize_contour(red_mean_guess, red_cov_guess)
 	visualize_contour(blue_mean_guess, blue_cov_guess)
-	# plt.show()
+	plt.savefig(os.path.join(output_dir, "03_first-guess"))
 
 	plt.clf()
 	N_ITER = 10 # number of iterations of EM
@@ -195,7 +204,8 @@ def main():
 	plt.plot(blue_x, blue_y, 'ro', color='b', ms=1)
 	plt.axis('equal')
 	visualize_contour(red_mean_guess, red_cov_guess, 0.1)
-	visualize_contour(blue_mean_guess, blue_cov_guess, 0.1) 
+	visualize_contour(blue_mean_guess, blue_cov_guess, 0.1)
+	plt.savefig(os.path.join(output_dir, "03_first-guess_2"))
 
 	for i in range(N_ITER):
 		## Expectation step
@@ -226,6 +236,8 @@ def main():
 		print("Iteration %s" % str(i+1))
 		print_mean_cov("red", red_mean_guess, red_cov_guess)
 		print_mean_cov("blue", blue_mean_guess, blue_cov_guess)
+
+		plt.savefig(os.path.join(output_dir, "04_itr-%02d" % (i+1)))
 
 	plt.title(r'Iteration ' + str(N_ITER), fontsize=15);
 	plt.show()
